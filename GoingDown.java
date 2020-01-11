@@ -1,115 +1,89 @@
 import java.util.Scanner;
-
 public class GoingDown {
-	
-	public static int[][] board;
-	public static int M;
-	public static int[][] dp;
-	
-	public static int minGoDown(int r,int c) {
-		//System.out.println(r+","+c);
-		if(r==M-1) {
-			//dp[r][c]=board[r][c];
-			return board[r][c];
-		}
-		if(dp[r][c]!=-1) {
-			return dp[r][c];
-		}
-		
-		int t[]=new int[3];
-		
+	static int N;
+	static int[][] cost;
+	static int[][] dyn;
+	public static int minDown(int r,int c) {
+		int i,t;
+		int min=100000000;
+		if(r==N-1) return cost[r][c];
+		if(dyn[r][c]!=-1) return dyn[r][c];
 		if(c==0) {
-			t[0]=1000000000;
-			t[1]=minGoDown(r+1,0);
-			t[2]=minGoDown(r+1,1);
+			t=minDown(r+1,0);
+			if(min>t) min=t;
+			t=minDown(r+1,1);
+			if(min>t) min=t;
 		}
 		else if(c==1) {
-			t[0]=minGoDown(r+1,0);
-			t[1]=minGoDown(r+1,1);
-			t[2]=minGoDown(r+1,2);
+			t=minDown(r+1,0);
+			if(min>t) min=t;
+			t=minDown(r+1,1);
+			if(min>t) min=t;
+			t=minDown(r+1,2);
+			if(min>t) min=t;
 		}
-		else{
-			t[0]=minGoDown(r+1,1);
-			t[1]=minGoDown(r+1,2);
-			t[2]=1000000000;
+		else {
+			t=minDown(r+1,1);
+			if(min>t) min=t;
+			t=minDown(r+1,2);
+			if(min>t) min=t;
 		}
-		int min=t[0];
-		for(int i=1;i<3;i++)
-			if(min>t[i])
-				min=t[i];
-	//System.out.println("min:"+min);
-		dp[r][c]=board[r][c]+min;
-		return dp[r][c];
+		dyn[r][c]=min+cost[r][c];
+		return dyn[r][c];
 	}
-	
-	public static int maxGoDown(int r,int c) {
-		//System.out.println(r+","+c);
-		
-		if(r==M-1) {
-			dp[r][c]=board[r][c];
-			return dp[r][c];
-		}
-		
-		if(dp[r][c]!=-1)
-			return dp[r][c];
-		
-		int t[]=new int[3];
+	public static int maxDown(int r,int c) {
+		int i,t;
+		int max=-1;
+		if(r==N-1) return cost[r][c];
+		if(dyn[r][c]!=-1) return dyn[r][c];
 		if(c==0) {
-			t[0]=0;
-			t[1]=maxGoDown(r+1,0);
-			t[2]=maxGoDown(r+1,1);
+			t=maxDown(r+1,0);
+			if(max<t) max=t;
+			t=maxDown(r+1,1);
+			if(max<t) max=t;
 		}
 		else if(c==1) {
-			t[0]=maxGoDown(r+1,0);
-			t[1]=maxGoDown(r+1,1);
-			t[2]=maxGoDown(r+1,2);
+			t=maxDown(r+1,0);
+			if(max<t) max=t;
+			t=maxDown(r+1,1);
+			if(max<t) max=t;
+			t=maxDown(r+1,2);
+			if(max<t) max=t;
 		}
-		else{
-			t[0]=maxGoDown(r+1,1);
-			t[1]=maxGoDown(r+1,2);
-			t[2]=0;
+		else {
+			t=maxDown(r+1,1);
+			if(max<t) max=t;
+			t=maxDown(r+1,2);
+			if(max<t) max=t;
 		}
-		int max=t[0];
-		for(int i=1;i<3;i++)
-			if(max<t[i])
-				max=t[i];
-		//System.out.println("max:"+max);
-		dp[r][c]=max+board[r][c];
-		return dp[r][c];
+		dyn[r][c]=max+cost[r][c];
+		return dyn[r][c];
 	}
-	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Scanner key=new Scanner(System.in);
-		M=key.nextInt();
-		board=new int[M][3];
-		for(int i=0;i<M;i++)
-			for(int j=0;j<3;j++)
-				board[i][j]=key.nextInt();
-		key.close();
-		
-		int min=100000000;
-		int max=-1;
-		dp=new int[M][3];
-		
-		for(int i=0;i<M;i++)
-			for(int j=0;j<3;j++)
-				dp[i][j]=-1;
-		
-		for(int i=0;i<3;i++) {
-			int tmp=minGoDown(0,i);
-			if(tmp<min)
-				min=tmp;
+		Scanner s=new Scanner(System.in);
+		N=s.nextInt();
+		cost=new int[N][3];
+		dyn=new int[N][3];
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<3;j++) {
+				cost[i][j]=s.nextInt();
+				dyn[i][j]=-1;
+			}
 		}
-		
-		for(int i=0;i<M;i++)
-			for(int j=0;j<3;j++)
-				dp[i][j]=-1;
-		
+		s.close();
+		int min=100000000;
 		for(int i=0;i<3;i++) {
-			int tp=maxGoDown(0,i);
-			if(tp>max)
-				max=tp;
+			int t=minDown(0,i);
+			if(t<min) min=t;
+		}
+		for(int i=0;i<N;i++)
+			for(int j=0;j<3;j++)
+				dyn[i][j]=-1;
+		int max=-1;
+		for(int j=0;j<3;j++) {
+			int t=maxDown(0,j);
+			if(max<t) max=t;
 		}
 		System.out.println(max+" "+min);
 	}

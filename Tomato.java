@@ -1,92 +1,86 @@
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.LinkedList;
-/*
-class RPoint{
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+import java.util.ArrayList;
+class Coord{
 	int r,c;
-	RPoint(int r,int c){
-		this.r=r;
-		this.c=c;
+	Coord(int r,int c){
+		this.r=r;this.c=c;
 	}
 }
-*/
 public class Tomato {
-	static Queue <RPoint> q=new LinkedList();
-	public static int M,N;
-	public static int[][] box;
-	
-	public static int eval() {
+	static int M,N;
+	static int[][] box;
+	static int[][] visited;
+	static ArrayList<Coord> q=new ArrayList<Coord>();
+	static int cnt,day,emp;
+	static int front,rear;
+	static void find() {
 		for(int i=0;i<N;i++)
 			for(int j=0;j<M;j++)
-				if(box[i][j]==0)
-					return 0;
-		return 1;
+				if(box[i][j]==1&&visited[i][j]==0) {
+					q.add(new Coord(i,j));
+					visited[i][j]=1;
+					cnt++;
+				}
+				else if(box[i][j]==-1) emp++;
+		rear=cnt;
 	}
-	public static void print() {
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<M;j++)
-				System.out.print(box[i][j]+" ");
-			System.out.println();
+	static void time() {
+		
+		for(int i=front;i<rear;i++) {
+			Coord t=q.get(i);
+			if(t.r>0&&box[t.r-1][t.c]!=-1&&visited[t.r-1][t.c]==0) {
+				q.add(new Coord(t.r-1,t.c));
+				visited[t.r-1][t.c]=1;
+				cnt++;			
+			}
+			if(t.c>0&&box[t.r][t.c-1]!=-1&&visited[t.r][t.c-1]==0) {
+				q.add(new Coord(t.r,t.c-1));
+				visited[t.r][t.c-1]=1;
+				cnt++;			
+			}
+			if(t.r<N-1&&box[t.r+1][t.c]!=-1&&visited[t.r+1][t.c]==0) {
+				q.add(new Coord(t.r+1,t.c));
+				visited[t.r+1][t.c]=1;
+				cnt++;				
+			}
+			if(t.c<M-1&&box[t.r][t.c+1]!=-1&&visited[t.r][t.c+1]==0) {
+				q.add(new Coord(t.r,t.c+1));
+				visited[t.r][t.c+1]=1;
+				cnt++;			
+			}
 		}
-		System.out.println();
-	}
-	public static int dayPast() {
-		int day=1,cnt=0;
-		int tmp=q.size();
-		if(eval()!=0)
-			return 0;
-		while(!q.isEmpty()) {
-			RPoint t=q.poll();
-			cnt++;
-			if((t.r-1>=0)&&box[t.r-1][t.c]==0) {
-				box[t.r-1][t.c]=1;
-				q.offer(new RPoint(t.r-1,t.c));
-			}
-			if((t.c-1>=0)&&box[t.r][t.c-1]==0) {
-				box[t.r][t.c-1]=1;
-				q.offer(new RPoint(t.r,t.c-1));
-			}
-			if((t.r+1<N)&&box[t.r+1][t.c]==0) {
-				box[t.r+1][t.c]=1;
-				q.offer(new RPoint(t.r+1,t.c));
-			}
-			if((t.c+1<M)&&box[t.r][t.c+1]==0) {
-				box[t.r][t.c+1]=1;
-				q.offer(new RPoint(t.r,t.c+1));
-			}
-			if(eval()!=0)
-				return day;
-			//System.out.println(tmp+" "+cnt);
-			if(tmp==cnt) {
-				tmp=q.size();
-				cnt=0;
-				//System.out.println("Day "+day);
-				//print();
-				day++;
-			}
-			
-		}
-		return -1;
+		front=rear;
+		rear=cnt;
+		day++;
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Scanner key =new Scanner(System.in);
-		M=key.nextInt();
-		N=key.nextInt();
-		box=new int[N][M];
-		for(int i=0;i<N;i++)
-			for(int j=0;j<M;j++)
-				box[i][j]=key.nextInt();
-		//print();
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<M;j++) {
-				if(box[i][j]==1) {
-					q.offer(new RPoint(i,j));
-				}
+		try {
+			BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+			StringTokenizer s=new StringTokenizer(br.readLine());
+			M=Integer.parseInt(s.nextToken());
+			N=Integer.parseInt(s.nextToken());
+			box=new int[N][M];
+			visited=new int[N][M];
+			for(int i=0;i<N;i++) {
+				s=new StringTokenizer(br.readLine());
+				for(int j=0;j<M;j++)
+					box[i][j]=Integer.parseInt(s.nextToken());
 			}
+			cnt=0;day=0;
+			front=0; rear=0;
+			find();
+			while(front<rear&&cnt<N*M-emp) {
+				time();
+			}
+			if(cnt>=N*M-emp)
+				System.out.println(day);
+			else System.out.println(-1);
 		}
-		System.out.println(dayPast());
-		
+		catch(IOException e) {}
 	}
 
 }
